@@ -1,3 +1,6 @@
+// Package ftests provides a simple and systematic way to test functions:
+// we merely check that on given inputs, functions indeed compute the
+// expected outputs.
 package ftests
 
 // https://tales.mbivert.com/on-a-function-based-test-framework/
@@ -18,11 +21,14 @@ type Test struct {
 	Expected []interface{}
 }
 
+// Compute the filename where the given function has been defined.
 func getFn(f interface{}) string {
 	xs := strings.Split((runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()), ".")
 	return xs[len(xs)-1]
 }
 
+// Test that the function (f) applied to the given input (args)
+// returns the expected output (expected). Calls t.Fatalf() on failure.
 func Run1(t *testing.T, f interface{}, args []interface{}, expected []interface{}) {
 	// []interface{} -> []reflect.Value
 	var vargs []reflect.Value
@@ -63,6 +69,8 @@ func Run1(t *testing.T, f interface{}, args []interface{}, expected []interface{
 	}
 }
 
+// Perform ftests.Run1() on all the given tests. Stop on first
+// failure.
 func Run(t *testing.T, tests []Test) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s()/%s", getFn(test.Fun), test.Name), func(t *testing.T) {
