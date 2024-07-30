@@ -1,15 +1,58 @@
-# Note
-I'm publishing this mainly because I "need" it as a Go module
-(I'm starting to need to copy ``ftests.go`` multiple times within
-the same project, for different packages).
+# Overview
+This package provides a simple and systematic way to test
+functions: we merely check that on given inputs, functions indeed
+compute the expected outputs; tests are still managed via the
+standard [``testing``][godoc-testing] package.
 
-That's to say, copying the file is probably what you'd want
-instead of adding a dependency. I'm including implementations
-for other languages for completeness.
+Tests can then be wrapped in a simple ``struct{}``:
 
-# Examples
+    type Test struct {
+    	Name string // Test name
+    	Fun any // Function to test
+    	Args []any // Inputs
+    	Expected []any // Expected outputs
+    }
 
-Some places where it's being used:
+Arrays of tests may then be tested using ``ftests.Run()``:
+
+    import (
+    	"testing"
+    	"github.com/mbivert/ftests"
+    )
+
+    func TestSomething(t *testing.T) {
+    	ftests.Run(t, []ftests.Test{
+    		{
+    			"(x -> x)(42) = 42",
+    			func(x any) any { return x },
+    			[]interface{}{42},
+    			[]interface{}{42},
+    		},
+    		{
+        		...
+    		},
+    		...
+    	})
+    }
+
+"Weird" cases (e.g. environment alteration) can be managed
+by wrapping the code with a few extra functions. See
+this [blog post][tales-ftest] for some examples.
+
+**<u>Note:</u>** Because of the regularity of the tests format,
+it's easy to move towards or away from this pattern, to programatically
+alter the tests, to run the same tests in different settings, etc.
+In particular, it's a great way to progressively add
+tests to an existing codebase with almost no overhead.
+
+# Other languages (Nix, JavaScript, Perl, etc.)
+Implementations for other languages are also provided. The
+main requirements are rather standard nowadays:
+
+  - [tuples][wp-en-tuple];
+  - deep-comparison mechanism.
+
+# Usage examples
 
   - ``go(1)``:
     - [github.com/mbivert/auth][github.com/mbivert/auth];
@@ -24,37 +67,6 @@ Some places where it's being used:
     - [github.com/mbivert/zm/tree/master/tests][github.com/mbivert/zm/tree/master/tests];
   - ``nix(1)``:
     - [github.com/mbivert/nix-series-code][github.com/mbivert/nix-series-code].
-
-# Introduction
-This directory contains, in their respective sub-directories,
-per-programming language implementation examples of a rustic
-function-based test framework.
-
-Loosely, the main data-structure, a `test`, is mainly:
-
-  - a function (pointer to function);
-  - some input: function arguments ([tuple][wp-en-tuple]);
-  - some (expected) output: return values ([tuple][wp-en-tuple]);
-  - a description (string);
-
-Such a test is run by calling the related function with
-the given arguments, and comparing its output to the
-expected values.
-
-Most modern languages have [tuples][wp-en-tuple], and
-allow, at least in most cases, for some kind of deep-comparison,
-which are the two main requirements for an implementation.
-
-Because of the regularity of the test format, it
-should be easy to move away from this pattern if need be. Or
-the other way around: it's a great way to progressively add
-tests to an existing codebase with almost no overhead.
-
-For more, see this [blog post][tales-ftest].
-
-Implementations are provided as references only. The main
-takeaway is the pattern; implementation details can vary from
-project to project, or language to language.
 
 [tales-ftest]: https://tales.mbivert.com/on-function-based-test-framework/
 
@@ -71,3 +83,5 @@ project to project, or language to language.
 [github.com/mbivert/zm/tree/master/tests]: https://github.com/mbivert/zm/tree/master/tests
 
 [github.com/mbivert/nix-series-code]: https://github.com/mbivert/nix-series-code
+
+[godoc-testing]: https://pkg.go.dev/testing

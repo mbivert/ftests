@@ -12,17 +12,17 @@ func TestRun(t *testing.T) {
 		{
 			"(x -> x)(42) = 42",
 			func(x any) any { return x },
-			[]interface{}{42},
-			[]interface{}{42},
+			[]any{42},
+			[]any{42},
 		},
 		{
 			"Meta (x -> x)(42) = 42 (expect success)",
 			Run1,
-			[]interface{}{
+			[]any{
 				t,
 				func(x any) any { return x },
-				[]interface{}{42},
-				[]interface{}{42},
+				[]any{42},
+				[]any{42},
 			},
 			nil,
 		},
@@ -30,5 +30,5 @@ func TestRun(t *testing.T) {
 		// because we're calling t.Fatalf() on purpose.
 		//
 		// Anyway.
-	});
+	})
 }

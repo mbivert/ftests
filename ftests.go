@@ -15,22 +15,22 @@ import (
 )
 
 type Test struct {
-	Name     string
-	Fun      interface{}
-	Args     []interface{}
-	Expected []interface{}
+	Name string // Test name
+	Fun any // Function to test
+	Args []any // Inputs
+	Expected []any // Expected outputs
 }
 
 // Compute the filename where the given function has been defined.
-func getFn(f interface{}) string {
+func getFn(f any) string {
 	xs := strings.Split((runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()), ".")
 	return xs[len(xs)-1]
 }
 
 // Test that the function (f) applied to the given input (args)
 // returns the expected output (expected). Calls t.Fatalf() on failure.
-func Run1(t *testing.T, f interface{}, args []interface{}, expected []interface{}) {
-	// []interface{} -> []reflect.Value
+func Run1(t *testing.T, f any, args []any, expected []any) {
+	// []any -> []reflect.Value
 	var vargs []reflect.Value
 	for _, v := range args {
 		vargs = append(vargs, reflect.ValueOf(v))
@@ -38,8 +38,8 @@ func Run1(t *testing.T, f interface{}, args []interface{}, expected []interface{
 
 	got := reflect.ValueOf(f).Call(vargs)
 
-	// []reflect.Value -> []interface{}
-	var igot []interface{}
+	// []reflect.Value -> []any
+	var igot []any
 	for _, v := range got {
 		igot = append(igot, v.Interface())
 	}
